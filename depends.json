@@ -23,7 +23,7 @@
   "graphics": {
     "banner": "figlet",
     "dye": {
-      "a": "cargo"
+      "a": "cargo",
       "b": "install dye-cli"
     }
   }
