@@ -3,7 +3,7 @@
   "internetCLI": [
     "curl",
     "wget"
-  ]
+  ],
   "symlinks": [
     "#!/bin/bash",
     "#!/bin/zsh"
