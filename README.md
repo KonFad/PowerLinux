@@ -16,6 +16,11 @@ sudo pacman -S jq wget
 
 it's dependencies before installing.
 
+download configs near the install script 
+```
+wget https://raw.githubusercontent.com/KonFad/PowerLinux/main/pkg.json
+wget https://raw.githubusercontent.com/KonFad/PowerLinux/main/depends.json
+```
 Then run the installation script:
 ```
 wget -qO- https://raw.githubusercontent.com/KonFad/PowerLinux/main/install | bash
