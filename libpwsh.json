@@ -1,0 +1,13 @@
+{
+  "programm_lib": "libpwsh",
+  "method": "pwsh",
+  "build": {
+    "name": "Powershell",
+    "platform_build": "uname -a",
+    "version": "1.0.1",
+    "programm_lang": "C#",
+    "build_by": "kon_fad",
+    "welcome": "Welcome to Linux Powershell gui wrapper!"
+  }
+}
+

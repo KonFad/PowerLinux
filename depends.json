@@ -1,0 +1,30 @@
+{
+  "light-depends": [
+    "jq",
+    "git",
+    "curl",
+    "sudo"
+  ],
+  "devel-base": [
+    "glibc",
+    "libgcc",
+    "libstdc++",
+    "cargo"
+  ],
+  "data-utils": [
+    "libicu",
+    "tzdata",
+    "zlib1g"
+  ],
+  "update": [
+    "zsh",
+    "bash"
+  ],
+  "graphics": {
+    "banner": "figlet",
+    "dye": {
+      "a": "cargo"
+      "b": "install dye-cli"
+    }
+  }
+}

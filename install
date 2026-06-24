@@ -1,0 +1,153 @@
+#!/bin/bash
+
+symlinks=$(jq -r '.symlinks[]' pkg.json)
+for link in $symlinks; do
+    echo "$link"
+done
+
+clear
+sleep 0.05
+
+distro_base() {
+    ubuntu=$(jq -r '.distros.ubuntu' pkg.json)
+    arch=$(jq -r '.distros.arch' pkg.json)
+    termux1=$(jq -r '.distros.termux[0]' pkg.json)
+    termux2=$(jq -r '.distros.termux[1]' pkg.json)
+    fedora=$(jq -r '.distros.fedora' pkg.json)
+    alpine=$(jq -r '.distros.alpine' pkg.json)
+    nixos_env=$(jq -r '.distros.nixos[0]' pkg.json)
+    nixos_shell=$(jq -r '.distros.nixos[1]' pkg.json)
+    nixos_profile=$(jq -r '.distros.nixos[2]' pkg.json)
+    brew=$(jq -r '.distros.other.hb' pkg.json)
+    aur=$(jq -r '.distros.other.AUR' pkg.json)
+}
+
+distro_base
+
+read -p "Choose your distro (ubuntu/arch/termux/fedora/alpine/nixos): " choose
+
+case $choose in
+    ubuntu) cmd=$ubuntu ;;
+    arch) cmd=$arch ;;
+    termux) echo "Choose: 1) apt install  2) pkg install"; read -p "Enter 1 or 2: " choice; [ "$choice" -eq 1 ] && cmd=$termux1 || cmd=$termux2 ;;
+    fedora) cmd=$fedora ;;
+    alpine) cmd=$alpine ;;
+    nixos) echo "Choose: 1) nix-env  2) nix-shell  3) nix profile"; read -p "Enter 1, 2 or 3: " choice; [ "$choice" -eq 1 ] && cmd=$nixos_env; [ "$choice" -eq 2 ] && cmd=$nixos_shell; [ "$choice" -eq 3 ] && cmd=$nixos_profile ;;
+    *) echo "Unknown distro"; exit 1 ;;
+esac
+
+echo "Command: $cmd"
+
+function depends {
+    one=$(jq -r '.light-depends[]' depends.json)
+    two=$(jq -r '.data-utils[]' depends.json)
+    three=$(jq -r '.update[]' depends.json)
+    four=$(jq -r '.graphics.banner' depends.json)
+    five=$(jq -r '.devel-base[]' depends.json)
+
+    packages="$one $two $three $four $five"
+    echo "Installing dependendcies..."
+    bash -c "$cmd $packages"
+}
+
+cargo_utils() {
+    cmd1=$(jq -r '.graphics.dye.a' depends.json)
+    cmd2=$(jq -r '.graphics.dye.b' depends.json)
+
+    echo "installing dye-cli..."
+    bash -c "$cmd1 $cmd2"
+}
+
+install_pwsh() {
+    netcli=$(jq -r '.internetCLI[2]' pkg.json)
+
+    echo "Installing PowerShell (pwsh)..." | dye blue
+
+    if command -v pwsh &> /dev/null; then
+        echo "pwsh installed: $(pwsh --version)" | dye green
+        return 0
+    fi
+
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "aarch64" ]; then
+        URL="https://github.com/PowerShell/PowerShell/releases/download/v7.6.2/powershell-7.6.2-linux-arm64.tar.gz"
+    elif [ "$ARCH" = "x86_64" ]; then
+        URL="https://github.com/PowerShell/PowerShell/releases/download/v7.6.2/powershell-7.6.2-linux-x64.tar.gz"
+    else
+        echo "Unknown: $ARCH"
+        return 1
+    fi
+
+    echo "Downloading PowerShell for $ARCH..."
+    bash -c "$netcli -O /tmp/powershell.tar.gz $URL"
+
+    sudo mkdir -p /opt/microsoft/powershell/7
+    sudo tar -xzf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/7
+    sudo ln -sf /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh
+
+    echo "Installed: $(pwsh --version)" | dye cyan
+}
+
+function type {
+    standard=$(jq -r '.systemtype."standard-linux"' pkg.json)
+    termux=$(jq -r '.systemtype.termux' pkg.json)
+
+    if [ -d "/data/data/com.termux" ]; then
+        echo "Termux detected. Path: $termux"
+    else
+        echo "Standard Linux. Path: $standard"
+    fi
+}
+
+depends
+cargo_utils
+install_pwsh
+type
+
+
+clear
+figlet "PowerLinux" | dye cyan
+echo " "
+echo " "
+echo " "
+echo " "
+echo "Installed!" | dye green
+echo "cloning programm..." | dye cyan
+
+sleep 1
+
+clonecli=$(jq -r '.InstallCLI' pkg.json)
+
+bash -c "$clonecli clone https://github.com/KonFad/tarx-archiveCLI-kon_fad11.git"
+
+install_dotnet() {
+    echo "Downloading .NET SDK..."
+
+    if command -v dotnet &> /dev/null; then
+        echo ".NET SDK already installed: $(dotnet --version)"
+        return 0
+    fi
+
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "aarch64" ]; then
+        URL="https://dotnetcli.azureedge.net/dotnet/Sdk/10.0.301/dotnet-sdk-10.0.301-linux-arm64.tar.gz"
+    elif [ "$ARCH" = "x86_64" ]; then
+        URL="https://dotnetcli.azureedge.net/dotnet/Sdk/10.0.301/dotnet-sdk-10.0.301-linux-x64.tar.gz"
+    else
+        echo "Unknown: $ARCH"
+        return 1
+    fi
+
+    echo "Downloading .NET SDK for $ARCH..."
+    bash -c "$netcli -O /tmp/dotnet-sdk.tar.gz $URL"
+
+    sudo mkdir -p /opt/dotnet
+    sudo tar -xzf /tmp/dotnet-sdk.tar.gz -C /opt/dotnet
+    sudo ln -sf /opt/dotnet/dotnet /usr/bin/dotnet
+
+    echo ".NET SDK installed: $(dotnet --version)"
+}
+
+install_dotnet
+
+echo "done!" | dye yellow

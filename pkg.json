@@ -1,0 +1,34 @@
+{
+  "installCLI": "git",
+  "internetCLI": [
+    "curl",
+    "wget"
+  ]
+  "symlinks": [
+    "#!/bin/bash",
+    "#!/bin/zsh"
+  ],
+  "distros": {
+    "ubuntu": "sudo apt install",
+    "arch": "sudo pacman -S",
+    "termux": [
+      "apt install",
+      "pkg install"
+    ],
+    "fedora": "sudo dnf install",
+    "alpine": "apk add",
+    "nixos": [
+      "nix-env -iA nixpkgs",
+      "nix-shell -p",
+      "nix profile install nixpkgs#"
+    ],
+    "other": {
+      "hb": "brew install",
+      "AUR": "yay install",
+    }
+  },
+  "systemtype": {
+    "termux": "/data/data/com.termux/files/usr/bin",
+    "standard-linux": "/usr/bin"
+  }
+}
