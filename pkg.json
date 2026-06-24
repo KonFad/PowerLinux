@@ -24,7 +24,7 @@
     ],
     "other": {
       "hb": "brew install",
-      "AUR": "yay install",
+      "AUR": "yay install"
     }
   },
   "systemtype": {
