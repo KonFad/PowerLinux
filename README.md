@@ -8,7 +8,7 @@ but for x86_64 it needs build on this platform,
 you can do it by yourself with dotnet 
 (remember, in installer you get .NET sdk automatically)
 
-#install
+# install
 
 ``` shell
 sudo pacman -S jq wget
@@ -21,7 +21,7 @@ Then run the installation script:
 wget -qO- https://raw.githubusercontent.com/KonFad/PowerLinux/main/install | bash
 ```
 
-#run && build
+# run && build
 
 try this commands:
 
@@ -34,12 +34,12 @@ dotnet run
 dotnet build
 ```
 
-#Raw Binary (ARM, or aarch64)
+# Raw Binary (ARM, or aarch64)
 ```
 ./bin/Debug/net10.0/PowerLinux
 ```
 
-#####Support
+# Support
 Termux
 Linux (standart like Alpine, Arch, Ubuntu...)
 
